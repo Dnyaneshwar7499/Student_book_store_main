@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Student Book Store - Buy Computer Science, Engineering, AI, and Academic Textbooks at student-friendly prices.">
+  <title>Student Book Store | Engineering & Academic Textbooks</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header>
+    <div class="nav-container">
+      <div class="logo" onclick="showSection('books')">
+        <span class="logo-icon">📖</span>
+        <span>StudentBook</span>
+      </div>
+
+      <nav class="nav-links">
+        <button id="navBooks" class="nav-btn active" onclick="showSection('books')">
+          <span>📚 Books</span>
+        </button>
+        
+        <button id="navWish" class="nav-btn" onclick="showSection('wishlist')">
+          <span>❤️ Wishlist</span>
+          <span id="wishCount" class="badge">0</span>
+        </button>
+
+        <button id="navCart" class="nav-btn" onclick="showSection('cart')">
+          <span>🛒 Cart</span>
+          <span id="cartCount" class="badge">0</span>
+        </button>
+
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          🌙
+        </button>
+
+        <div id="navAuthContainer" style="display: flex; align-items: center; gap: 8px;">
+          <!-- Populated by script.js -->
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="heroSection">
+    <div class="hero-content">
+      <h2>Academic & Engineering Textbooks</h2>
+      <p>Get instant access to top-rated college textbooks, reference guides, and coding handbooks with student discounts.</p>
+      
+      <div class="hero-features">
+        <div class="feature-pill">⚡ Fast Campus Delivery</div>
+        <div class="feature-pill">🎯 100% Genuine Editions</div>
+        <div class="feature-pill">🏷️ 10% Student Discount Applied</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search & Category Filter Section -->
+  <section class="controls-section" id="controlsSection">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        id="searchInput" 
+        class="search-input" 
+        placeholder="Search by title, author, or subject..." 
+        oninput="handleSearch(this.value)"
+      >
+    </div>
+
+    <div class="filter-categories">
+      <button class="cat-btn active" onclick="filterCategory('all', this)">All Books</button>
+      <button class="cat-btn" onclick="filterCategory('Programming', this)">Programming</button>
+      <button class="cat-btn" onclick="filterCategory('AI', this)">AI & ML</button>
+      <button class="cat-btn" onclick="filterCategory('Networking', this)">Networking</button>
+      <button class="cat-btn" onclick="filterCategory('Security', this)">Cyber Security</button>
+      <button class="cat-btn" onclick="filterCategory('Database', this)">Databases</button>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main class="main-container">
+
+    <!-- 1. Books Catalog Section -->
+    <section id="booksSection">
+      <div class="section-header">
+        <h2 class="section-title">Available Textbooks</h2>
+      </div>
+      <div class="books-grid" id="booksGrid">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+    </section>
+
+    <!-- 2. Cart Section -->
+    <section id="cartSection" style="display: none;">
+      <div class="section-header">
+        <h2 class="section-title">🛒 Your Shopping Cart</h2>
+        <button class="nav-btn" onclick="showSection('books')" style="background: var(--bg-subtle);">
+          ← Continue Shopping
+        </button>
+      </div>
+
+      <div class="cart-layout">
+        <div class="cart-items-container" id="cartItemsList">
+          <!-- Populated by script.js -->
+        </div>
+
+        <div class="cart-summary-card" id="cartSummary">
+          <h3 class="summary-title">Order Summary</h3>
+          <div id="summaryValues">
+            <!-- Populated by script.js -->
+          </div>
+          <button class="btn-checkout" onclick="proceedCheckout()">
+            Proceed to Checkout 🚀
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Wishlist Section -->
+    <section id="wishlistSection" style="display: none;">
+      <div class="section-header">
+        <h2 class="section-title">❤️ Your Saved Wishlist</h2>
+        <button class="nav-btn" onclick="showSection('books')" style="background: var(--bg-subtle);">
+          ← Back to Catalog
+        </button>
+      </div>
+      <div class="books-grid" id="wishlistGrid">
+        <!-- Populated by script.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Flipkart-Style Book Detail & Multi-Image Gallery Modal -->
+  <div class="modal-overlay book-modal-overlay" id="bookDetailModal" onclick="handleBookModalBackdrop(event)" role="dialog" aria-modal="true" aria-label="Book Details">
+    <div class="book-modal-container">
+      <button class="book-modal-close" onclick="closeBookModal()" title="Close (Esc)" aria-label="Close modal">✕</button>
+      <div class="book-modal-body" id="bookModalBody">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive "Look Inside" Sample Page Reader Modal -->
+  <div class="modal-overlay reader-modal-overlay" id="sampleReaderModal" onclick="handleReaderModalBackdrop(event)" role="dialog" aria-modal="true" aria-label="Sample Page Reader">
+    <div class="reader-modal-container">
+      <div class="reader-modal-header">
+        <div class="reader-title-group">
+          <span class="reader-badge">📖 Look Inside Sample Preview</span>
+          <h3 id="readerBookTitle" class="reader-book-title">Book Title</h3>
+        </div>
+        <div class="reader-header-actions">
+          <span id="readerPageIndicator" class="reader-page-pill">Page 1 / 4</span>
+          <button class="book-modal-close reader-close-btn" onclick="closeSampleReader()" title="Close Reader (Esc)">✕</button>
+        </div>
+      </div>
+      
+      <div class="reader-modal-body" id="readerModalBody">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+
+      <div class="reader-modal-footer">
+        <button class="reader-nav-btn" id="readerPrevBtn" onclick="prevSamplePage()">‹ Previous Page</button>
+        <div class="reader-thumbnails-nav" id="readerThumbsNav"></div>
+        <button class="reader-nav-btn" id="readerNextBtn" onclick="nextSamplePage()">Next Page ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Image Lightbox Modal -->
+  <div class="modal-overlay lightbox-overlay" id="imageLightboxModal" onclick="handleLightboxBackdrop(event)" role="dialog" aria-modal="true" aria-label="Fullscreen Image">
+    <div class="lightbox-container">
+      <button class="lightbox-close" onclick="closeLightbox()" title="Close (Esc)">✕</button>
+      <img id="lightboxImg" class="lightbox-img" src="" alt="Enlarged book view">
+      <div class="lightbox-caption" id="lightboxCaption"></div>
+      <button class="lightbox-nav prev" onclick="lightboxPrev(event)" title="Previous">‹</button>
+      <button class="lightbox-nav next" onclick="lightboxNext(event)" title="Next">›</button>
+    </div>
+  </div>
+
+  <!-- Comprehensive Checkout & Payment Modal -->
+  <div class="modal-overlay payment-modal-overlay" id="checkoutPaymentModal" onclick="handlePaymentModalBackdrop(event)" role="dialog" aria-modal="true" aria-label="Secure Checkout">
+    <div class="payment-modal-container">
+      
+      <!-- Modal Header -->
+      <div class="payment-modal-header">
+        <div class="payment-modal-title-group">
+          <div class="payment-badge-secure">
+            <span class="lock-icon">🔒</span>
+            <span>256-Bit SSL Encrypted & RBI Compliant</span>
+          </div>
+          <h2 class="payment-modal-title">StudentBook Express Checkout</h2>
+        </div>
+        
+        <div class="payment-header-actions">
+          <button type="button" class="btn-sound-preview" onclick="testPaymentSound()" title="Test Payment Sound Effect">
+            <span id="soundTestIcon">🔊</span>
+            <span class="sound-label">Test Sound</span>
+          </button>
+          <button type="button" class="book-modal-close" onclick="closePaymentModal()" title="Close Checkout (Esc)">✕</button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="payment-modal-body">
+        
+        <!-- Left Column: Delivery & Payment Methods -->
+        <div class="payment-main-col">
+          
+          <!-- Step 1: Delivery Information -->
+          <div class="checkout-step-card">
+            <div class="step-card-header">
+              <span class="step-number">1</span>
+              <div>
+                <h3 class="step-title">Campus Delivery & Student Details</h3>
+                <p class="step-subtitle">Express delivery directly to your college campus or hostel room</p>
+              </div>
+            </div>
+
+            <div class="checkout-form-grid">
+              <div class="form-field">
+                <label for="checkoutStudentName">Student Full Name</label>
+                <input type="text" id="checkoutStudentName" class="checkout-input" placeholder="e.g. Daneshwar Munde" autocomplete="name">
+              </div>
+              <div class="form-field">
+                <label for="checkoutStudentPhone">Mobile Number (WhatsApp SMS Updates)</label>
+                <input type="tel" id="checkoutStudentPhone" class="checkout-input" placeholder="e.g. 9876543210" maxlength="10">
+              </div>
+              <div class="form-field full-span">
+                <label for="checkoutAddress">Hostel / Campus Room Address</label>
+                <input type="text" id="checkoutAddress" class="checkout-input" placeholder="e.g. Room 204, Boys Hostel B, Engineering Campus">
+              </div>
+              <div class="form-field">
+                <label for="checkoutPincode">Campus Postal Pincode</label>
+                <input type="text" id="checkoutPincode" class="checkout-input" placeholder="e.g. 400076" maxlength="6">
+              </div>
+              <div class="form-field">
+                <label for="checkoutCity">City / Campus</label>
+                <input type="text" id="checkoutCity" class="checkout-input" placeholder="e.g. Pune / Mumbai">
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Payment Method Selection -->
+          <div class="checkout-step-card">
+            <div class="step-card-header">
+              <span class="step-number">2</span>
+              <div>
+                <h3 class="step-title">Select Payment Method</h3>
+                <p class="step-subtitle">Instant verified payments with real-time sound confirmation</p>
+              </div>
+            </div>
+
+            <!-- Payment Method Tiles -->
+            <div class="payment-methods-grid">
+              
+              <!-- 1. PhonePe & Flipkart UPI -->
+              <div class="payment-method-tile active" id="tile-phonepe" onclick="selectPaymentMethod('phonepe')">
+                <div class="tile-radio-indicator"></div>
+                <div class="tile-icon-box phonepe-box" title="PhonePe Official">
+                  <svg class="brand-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="10" fill="#5F259F"/>
+                    <!-- Authentic PhonePe Devanagari 'पे' Logo -->
+                    <rect x="11" y="10.5" width="22" height="3.5" rx="1.7" fill="#FFFFFF"/>
+                    <rect x="25" y="10.5" width="3.6" height="23" rx="1.8" fill="#FFFFFF"/>
+                    <path d="M15 14v6.5c0 3.3 2.7 6 6 6h4v-3.4h-4c-1.4 0-2.6-1.2-2.6-2.6V14h-3.4z" fill="#FFFFFF"/>
+                    <path d="M19.5 10.5c-.2-2.5 1.3-4.6 3.6-5.3l1.2 2.8c-1.1.4-1.8 1.4-1.7 2.5h-3.1z" fill="#FFFFFF"/>
+                  </svg>
+                </div>
+                <div class="tile-info">
+                  <div class="tile-name-row">
+                    <span class="tile-name">PhonePe & Flipkart UPI</span>
+                    <span class="tile-tag tag-purple">Instant ⚡</span>
+                  </div>
+                  <span class="tile-desc">Scan PhonePe QR, Enter UPI ID, Flipkart Pay Later</span>
+                </div>
+              </div>
+
+              <!-- 2. Google Pay -->
+              <div class="payment-method-tile" id="tile-gpay" onclick="selectPaymentMethod('gpay')">
+                <div class="tile-radio-indicator"></div>
+                <div class="tile-icon-box gpay-box" title="Google Pay Official">
+                  <svg class="brand-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="10" fill="#FFFFFF"/>
+                    <!-- Official Google 4-Color 'G' Logo -->
+                    <path d="M22 17.5c2.4 0 4.1 1 5 1.9l3.7-3.7C28.4 13.6 25.4 12 22 12c-6.1 0-11.2 4.1-12.8 9.7l4.5 3.5C14.7 20.8 18 17.5 22 17.5z" fill="#EA4335"/>
+                    <path d="M13.7 25.2c-.4-1.1-.6-2.2-.6-3.4 0-1.2.2-2.3.6-3.4L9.2 14.9C7.8 17.6 7 20.7 7 24s.8 6.4 2.2 9.1l4.5-3.5v-4.4z" fill="#FBBC04"/>
+                    <path d="M22 36c4.6 0 8.5-1.5 11.3-4.2l-4.4-3.5c-1.5 1-3.5 1.7-6.9 1.7-4 0-7.3-3.3-8.3-7.7L9.2 25.8C10.8 31.4 15.9 36 22 36z" fill="#34A853"/>
+                    <path d="M37 24.1c0-.9-.1-1.8-.3-2.6H22v5.1h8.5c-.4 2-1.5 3.7-3.2 4.8l4.4 3.5C34.3 32.5 37 28.7 37 24.1z" fill="#4285F4"/>
+                  </svg>
+                </div>
+                <div class="tile-info">
+                  <div class="tile-name-row">
+                    <span class="tile-name">Google Pay (GPay)</span>
+                    <span class="tile-tag tag-blue">Fast UPI</span>
+                  </div>
+                  <span class="tile-desc">Pay via Google Pay App, Tap-to-Pay, UPI QR</span>
+                </div>
+              </div>
+
+              <!-- 3. Credit / Debit Cards -->
+              <div class="payment-method-tile" id="tile-card" onclick="selectPaymentMethod('card')">
+                <div class="tile-radio-indicator"></div>
+                <div class="tile-icon-box card-box" title="Visa, MasterCard, RuPay">
+                  <svg class="brand-logo-svg" viewBox="0 0 50 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="50" height="36" rx="6" fill="#1E1B4B" stroke="#4F46E5" stroke-width="1.2"/>
+                    <!-- Mastercard Interlocking Circles -->
+                    <circle cx="19" cy="18" r="8" fill="#EB001B"/>
+                    <circle cx="31" cy="18" r="8" fill="#F79E1B"/>
+                    <path d="M25 12.3a8 8 0 0 1 0 11.4 8 8 0 0 1 0-11.4z" fill="#FF5F00"/>
+                  </svg>
+                </div>
+                <div class="tile-info">
+                  <div class="tile-name-row">
+                    <span class="tile-name">Credit & Debit Cards</span>
+                    <span class="tile-tag tag-indigo">Visa • MC • RuPay</span>
+                  </div>
+                  <span class="tile-desc">Visa, MasterCard, RuPay, Amex & Maestro</span>
+                </div>
+              </div>
+
+              <!-- 4. Razorpay -->
+              <div class="payment-method-tile" id="tile-razorpay" onclick="selectPaymentMethod('razorpay')">
+                <div class="tile-radio-indicator"></div>
+                <div class="tile-icon-box razorpay-box" title="Razorpay Official">
+                  <svg class="brand-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="10" fill="#0C2340"/>
+                    <!-- Razorpay Electric Blue Blade / Lightning Vector -->
+                    <path d="M25.5 8L13 24.5h8.5L18.5 36 31 19.5h-8.5L25.5 8z" fill="#3395FF"/>
+                  </svg>
+                </div>
+                <div class="tile-info">
+                  <div class="tile-name-row">
+                    <span class="tile-name">Razorpay Secure Gateway</span>
+                    <span class="tile-tag tag-cyan">Official ⚡</span>
+                  </div>
+                  <span class="tile-desc">NetBanking, UPI, Paytm & MobiKwik Wallets</span>
+                </div>
+              </div>
+
+              <!-- 5. Cash on Delivery (COD) -->
+              <div class="payment-method-tile" id="tile-cod" onclick="selectPaymentMethod('cod')">
+                <div class="tile-radio-indicator"></div>
+                <div class="tile-icon-box cod-box" title="Cash on Delivery">
+                  <svg class="brand-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="10" fill="#059669"/>
+                    <!-- Express Courier Parcel + Currency Rupee Symbol -->
+                    <path d="M12 17l10-5 10 5v12l-10 5-10-5V17z" stroke="#FFFFFF" stroke-width="2.2" stroke-linejoin="round"/>
+                    <path d="M12 17l10 5 10-5" stroke="#FFFFFF" stroke-width="2.2" stroke-linejoin="round"/>
+                    <path d="M22 22v12" stroke="#FFFFFF" stroke-width="2.2"/>
+                    <circle cx="31" cy="13" r="6.5" fill="#10B981" stroke="#FFFFFF" stroke-width="1.5"/>
+                    <text x="31" y="16.2" font-size="9.5" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="#FFFFFF">₹</text>
+                  </svg>
+                </div>
+                <div class="tile-info">
+                  <div class="tile-name-row">
+                    <span class="tile-name">Cash on Delivery (COD)</span>
+                    <span class="tile-tag tag-amber">Pay at Campus</span>
+                  </div>
+                  <span class="tile-desc">Pay cash or UPI scan when books arrive at your hostel</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Dynamic Payment Method Details Panel -->
+            <div class="payment-details-view" id="paymentDetailsView">
+              <!-- Rendered dynamically by script.js -->
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Right Column: Order Summary & Pay Button -->
+        <div class="payment-summary-col">
+          <div class="order-summary-box">
+            <h3 class="summary-box-title">Order Breakdown</h3>
+            
+            <div class="order-summary-books" id="checkoutBooksSummary">
+              <!-- Rendered dynamically by script.js -->
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-breakdown" id="checkoutAmountsBreakdown">
+              <!-- Rendered dynamically by script.js -->
+            </div>
+
+            <div class="student-savings-badge" id="checkoutSavingsBadge">
+              🎉 Student Savings applied!
+            </div>
+
+            <button type="button" id="btnPayNowSubmit" class="btn-pay-now" onclick="executePayment()">
+              <span class="pay-btn-icon">🔒</span>
+              <span id="btnPayText">Pay via PhonePe ⚡</span>
+            </button>
+
+            <div class="security-features-list">
+              <div class="sec-item">🛡️ <span>100% Genuine Textbook Guarantee</span></div>
+              <div class="sec-item">🚚 <span>Free Campus Express Delivery</span></div>
+              <div class="sec-item">🔊 <span>Real-Time Payment Chime & Voice Sound</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Enhanced Order Success Modal -->
+  <div class="modal-overlay" id="orderSuccessModal">
+    <div class="modal-content success-modal-content">
+      <div class="success-icon-wrap">
+        <div class="success-checkmark-circle">
+          <span class="success-check-tick">✓</span>
+        </div>
+        <div class="success-sound-waves">
+          <span class="wave wave1"></span>
+          <span class="wave wave2"></span>
+          <span class="wave wave3"></span>
+        </div>
+      </div>
+      <h2 class="success-title">Order Placed Successfully!</h2>
+      <p class="success-subtitle">Payment confirmed & verified for StudentBook Store</p>
+      
+      <div id="modalOrderDetails" class="success-details-box">
+        <!-- Filled dynamically -->
+      </div>
+
+      <div class="success-action-buttons">
+        <button type="button" class="btn-sound-replay" onclick="replayOrderSound()">
+          <span>🔊 Replay Payment Sound</span>
+        </button>
+        <button type="button" class="btn-print-receipt" onclick="printOrderInvoice()">
+          <span>📄 Print / Save Invoice</span>
+        </button>
+        <button type="button" class="btn-primary" style="width: 100%; justify-content: center;" onclick="closeModal()">
+          Continue Shopping 📚
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-payment-trust">
+      <div class="trust-title-row">
+        <span class="trust-lock-icon">🔒</span>
+        <span class="trust-heading">100% Verified Campus Payment Gateways</span>
+        <span class="trust-sub">• Instant Soundbox Voice & Chime</span>
+      </div>
+      <div class="footer-payment-logos">
+        <div class="footer-pay-pill" title="PhonePe Official UPI">
+          <svg viewBox="0 0 44 44" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="44" height="44" rx="8" fill="#5F259F"/><rect x="11" y="10.5" width="22" height="3.5" rx="1.7" fill="#FFFFFF"/><rect x="25" y="10.5" width="3.6" height="23" rx="1.8" fill="#FFFFFF"/><path d="M15 14v6.5c0 3.3 2.7 6 6 6h4v-3.4h-4c-1.4 0-2.6-1.2-2.6-2.6V14h-3.4z" fill="#FFFFFF"/><path d="M19.5 10.5c-.2-2.5 1.3-4.6 3.6-5.3l1.2 2.8c-1.1.4-1.8 1.4-1.7 2.5h-3.1z" fill="#FFFFFF"/></svg>
+          <span>PhonePe</span>
+        </div>
+        <div class="footer-pay-pill" title="Google Pay Official">
+          <svg viewBox="0 0 44 44" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="44" height="44" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/><path d="M22 17.5c2.4 0 4.1 1 5 1.9l3.7-3.7C28.4 13.6 25.4 12 22 12c-6.1 0-11.2 4.1-12.8 9.7l4.5 3.5C14.7 20.8 18 17.5 22 17.5z" fill="#EA4335"/><path d="M13.7 25.2c-.4-1.1-.6-2.2-.6-3.4 0-1.2.2-2.3.6-3.4L9.2 14.9C7.8 17.6 7 20.7 7 24s.8 6.4 2.2 9.1l4.5-3.5v-4.4z" fill="#FBBC04"/><path d="M22 36c4.6 0 8.5-1.5 11.3-4.2l-4.4-3.5c-1.5 1-3.5 1.7-6.9 1.7-4 0-7.3-3.3-8.3-7.7L9.2 25.8C10.8 31.4 15.9 36 22 36z" fill="#34A853"/><path d="M37 24.1c0-.9-.1-1.8-.3-2.6H22v5.1h8.5c-.4 2-1.5 3.7-3.2 4.8l4.4 3.5C34.3 32.5 37 28.7 37 24.1z" fill="#4285F4"/></svg>
+          <span>Google Pay</span>
+        </div>
+        <div class="footer-pay-pill" title="Visa Card">
+          <svg viewBox="0 0 54 20" width="38" height="15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.5 18.5l3.2-18h5.2l-3.2 18h-5.2zm18.3-17.6c-1-.4-2.6-.8-4.5-.8-5 0-8.5 2.5-8.5 6.1 0 2.7 2.5 4.2 4.4 5.1 2 .9 2.6 1.5 2.6 2.3 0 1.2-1.6 1.8-3 1.8-2 0-3.1-.3-4.8-1l-.7-.3-.7 4.3c1.2.5 3.4 1 5.7 1 5.3 0 8.7-2.5 8.7-6.4 0-2.1-1.3-3.7-4.2-5-1.8-.8-2.9-1.4-2.9-2.3 0-.8.9-1.6 2.9-1.6 1.6 0 2.8.3 3.7.7l.4.2.8-4.1zm13.7.1h-4.1c-1.3 0-2.2.4-2.8 1.7l-7.9 16.9h5.5l1.1-2.9h6.7l.6 2.9h4.8l-3.9-18.6zm-5.9 12.1l2.1-5.6c-.1 0 1.2 3.1 1.4 3.8l.8 3.8h-4.3v-2zm-28.7-12.2l-5.1 12.3-.5-2.7c-1-3.1-4-6.4-7.4-8.1l4.8 17.1h5.6l8.3-18.6h-5.7z" fill="#1A1F71"/><path d="M9.8 1.5H.5L0 3.7c3.6.8 6 2.8 7.9 5.5L9.8 1.5z" fill="#F79E1B"/></svg>
+        </div>
+        <div class="footer-pay-pill" title="MasterCard">
+          <svg viewBox="0 0 38 24" width="28" height="18" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="#EB001B"/><circle cx="26" cy="12" r="10" fill="#F79E1B"/><path d="M19 5.2a10 10 0 0 1 0 13.6 10 10 0 0 1 0-13.6z" fill="#FF5F00"/></svg>
+        </div>
+        <div class="footer-pay-pill" title="RuPay India">
+          <svg viewBox="0 0 68 22" width="46" height="15" fill="none" xmlns="http://www.w3.org/2000/svg"><text x="0" y="16" font-family="'Outfit', sans-serif" font-weight="900" font-style="italic" font-size="16" fill="var(--text-main)">RuPay</text><path d="M52 3l6 8-6 8h4.5l6-8-6-8H52z" fill="#097939"/><path d="M58 3l6 8-6 8h4.5l6-8-6-8H58z" fill="#00A4E4"/></svg>
+        </div>
+        <div class="footer-pay-pill" title="Razorpay Gateway">
+          <svg viewBox="0 0 44 44" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="44" height="44" rx="8" fill="#0C2340"/><path d="M25.5 8L13 24.5h8.5L18.5 36 31 19.5h-8.5L25.5 8z" fill="#3395FF"/></svg>
+          <span>Razorpay</span>
+        </div>
+        <div class="footer-pay-pill" title="Cash on Delivery">
+          <svg viewBox="0 0 44 44" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="44" height="44" rx="8" fill="#059669"/><path d="M12 17l10-5 10 5v12l-10 5-10-5V17z" stroke="#FFFFFF" stroke-width="2.2" stroke-linejoin="round"/><circle cx="31" cy="13" r="6.5" fill="#10B981" stroke="#FFFFFF" stroke-width="1.5"/><text x="31" y="16.2" font-size="9.5" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="#FFFFFF">₹</text></svg>
+          <span>Campus COD</span>
+        </div>
+      </div>
+    </div>
+    <p>© 2026 Student Book Store. Designed for College & University Students.</p>
+  </footer>
+
+  <!-- Back to Top Button -->
+  <button id="backToTopBtn" class="btn-back-to-top" onclick="scrollToTop()" title="Back to top">
+    ↑
+  </button>
+
+  <!-- Scripts -->
+  <script src="script.js"></script>
+</body>
+</html>
